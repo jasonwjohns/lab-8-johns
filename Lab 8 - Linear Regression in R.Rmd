@@ -84,3 +84,31 @@ salmon_final_graph
 
 ```
 
+####9. Make predictions using the model
+```{r}
+# Making predictions using the model
+
+# New DF with years we want to predict for
+new_years <- data.frame(year = c(2022, 2024, 2026, 2028))
+new_years
+
+# Using predict() function with 95% CI
+future_predict <- predict(salmon_model, newdata = new_years, interval = "confidence") 
+future_predict
+
+# Bind the predicted outcomes to the new_years df to create a useful table
+predictions <- data.frame(new_years, future_predict) 
+predictions
+
+```
+
+####10. Find Pearson's r (correlation)
+```{r}
+pearson_salmon <- cor.test(salmon$year, salmon$salmon_fresh)
+pearson_salmon
+
+```
+#### Pearson's r correlation coefficient = 0.97. This is a strong correlation (>0.8).
+
+#### Conclusion: “Year significantly predicts tons of salmon imports (b = 7550, t(26) = 21.7, p < 0.001) with a strong positive correlation between the two (Pearson’s r = 0.97). The overall model (imports(tons) = 7550(year) − -14982940; both in tons) explains a significant amount of variance in tons of salmon imports (F(1,26) = 471.9, p < 0.001, R2 = 94.8).”
+
