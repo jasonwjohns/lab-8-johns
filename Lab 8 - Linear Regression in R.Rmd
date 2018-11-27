@@ -9,3 +9,78 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, include = FALSE}
+# Load tidyverse & data
+
+library(tidyverse)
+salmon <- read_csv("salmon_imports.csv")
+
+```
+
+
+####4. Exploratory scatterplot
+```{r}
+# Exploratory scatterplot
+
+salmon_scatter <- ggplot(salmon, aes(x = year, y = salmon_fresh)) +
+  geom_point()
+
+salmon_scatter
+
+# It seems like linea regression is an appropriate method for analyzing the relationship between year and fresh salmon imports. I have no major concerns about using regression for this analysis.
+
+```
+
+
+####5. Linear regression
+```{r}
+# Running regression
+
+salmon_model <- lm(salmon_fresh ~ year, data = salmon)
+salmon_model
+
+# imports(tons) = -14982940 + 7550(year)
+```
+
+####  - The slope means that for every successional year, there is a 7550 ton increase in salmon imports.
+####  - The largely negative y-intercept means that if we were to go back to 1989, there would be -14982940 tons of salmon imports. Thus, this model cannot be extrapolated to past values.
+
+
+####6. Model diagnostics
+```{r}
+par(mfrow = c(2,2))
+plot(salmon_model)
+
+```
+
+#### -Based on the qq plot, the residuals appear to be relatively normally distributed, other than at lower and upper theoretical quantiles
+#### -There are concerns about some major outliers as well as a lack of heteroscedasticity. The residuals appear to be more widely distributed at larger fitted values.
+
+
+####7. Explore model fit and significance
+```{r}
+# Looking further at model with summary()
+
+summary(salmon_model)
+
+
+```
+
+#### - Year is a statistically significant predictor of salmon imports (p < 0.001).
+#### - Based on the R^2 value of 0.9478, 94.8% of the variance in tons of salmon imports is predictable by year.
+#### - 5.2% of the variance in tons of salmon imports is not predictable by year.
+
+####8. Prepare a final graph
+```{r}
+# Prepare final graph
+
+salmon_final_graph <- ggplot(salmon, aes(x = year, y = salmon_fresh)) + 
+  geom_point() +
+  geom_smooth(method = lm, se = TRUE, size = 0.5, color = "gray20") + theme_bw() +
+  scale_x_continuous(expand = c(0,0), limits = c(1990, 2017)) +
+  labs(x = "Year", y = "U.S. Annual Fresh Salmon Imports\n(1,000 pounds)")
+
+salmon_final_graph
+
+```
+
